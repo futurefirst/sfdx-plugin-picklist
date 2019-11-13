@@ -2,8 +2,13 @@
   "name": "@futurefirst/sfdx-plugin-picklist",
   "description": "SFDX CLI plugin to manipulate picklist values",
   "version": "0.0.0",
-  "author": "David Knoll @davidknoll",
-  "bugs": "https://github.com/futurefirst/sfdx-plugin-picklist/issues",
+  "author": {
+    "name": "David Knoll",
+    "email": "david@futurefirst.org.uk"
+  },
+  "bugs": {
+    "url": "https://github.com/futurefirst/sfdx-plugin-picklist/issues"
+  },
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -38,7 +43,9 @@
   ],
   "homepage": "https://github.com/futurefirst/sfdx-plugin-picklist",
   "keywords": [
-    "sfdx-plugin"
+    "sfdx-plugin",
+    "picklist",
+    "options"
   ],
   "license": "MIT",
   "oclif": {
@@ -53,7 +60,10 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "futurefirst/sfdx-plugin-picklist",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/futurefirst/sfdx-plugin-picklist.git"
+  },
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p test -t stylish",
