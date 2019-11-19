@@ -2,6 +2,7 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxError } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { MetadataInfo } from 'jsforce';
+import * as csvStringify from 'csv-stringify/lib/sync';
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('@futurefirst/sfdx-plugin-picklist', 'list');
@@ -18,7 +19,7 @@ export default class List extends SfdxCommand {
   protected static flagsConfig = {
     sobjecttype: flags.string({ char: 's', description: messages.getMessage('sobjecttypeFlagDescription'), required: true }),
     fieldname: flags.string({ char: 'f', description: messages.getMessage('fieldnameFlagDescription'), required: true }),
-    // resultformat: flags.string({ char: 'r', description: messages.getMessage('resultformatFlagDescription'), options: ['human', 'csv', 'json'], default: 'human' }),
+    resultformat: flags.string({ char: 'r', description: messages.getMessage('resultformatFlagDescription'), options: ['human', 'csv', 'json'], default: 'human' }),
   };
 
   protected static requiresUsername = true;
@@ -67,15 +68,30 @@ export default class List extends SfdxCommand {
     const values = cf.valueSet.valueSetDefinition.value;
     // const columns = ['label', 'fullName', 'default', 'color', 'isActive', 'description'];
     const tableOptions = { columns: [
-      { key: 'label' },
       { key: 'fullName' },
       { key: 'default' },
+      { key: 'label' },
     ] };
-    if (!this.flags.json) {
-      this.ux.table(values, tableOptions);
-      this.ux.log(messages.getMessage('recordCount', [values.length]));
+    const csvOptions = { header: true, columns: ['fullName', 'default', 'label'] };
+    const result = { totalSize: values.length, done: true, records: values };
+
+    // Output results to console in requested format
+    switch (this.flags.json ? 'json' : this.flags.resultformat) {
+      case 'human':
+        this.ux.table(values, tableOptions);
+        this.ux.log(messages.getMessage('recordCount', [values.length]));
+        break;
+      case 'csv':
+        this.ux.log(csvStringify(values, csvOptions));
+        break;
+      case 'json':
+        // If --json has been passed, the results get output already
+        if (!this.flags.json) {
+          this.ux.logJson({ status: 0, result });
+        }
+        break;
     }
 
-    return { totalSize: values.length, done: true, records: values };
+    return result;
   }
 }
