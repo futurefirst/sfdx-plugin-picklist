@@ -36,9 +36,16 @@ export default class List extends SfdxCommand {
       valueSet?: {
         valueSetName?: string;
         valueSetDefinition?: {
+          sorted: string;
           value: CustomValue[];
         }
       };
+    }
+
+    interface GlobalValueSet extends MetadataInfo {
+      fullName: string;
+      customValue: CustomValue[];
+      sorted: string;
     }
 
     const conn = this.org.getConnection();
@@ -56,13 +63,20 @@ export default class List extends SfdxCommand {
     if (!['Picklist', 'MultiselectPicklist'].includes(cf.type)) {
       throw new SfdxError(messages.getMessage('errorNotPicklist', [cfName]));
     }
-    // TODO We don't yet support standard picklists or those using global value sets,
-    // as the Metadata API stuff required is different
+    // TODO We don't yet support standard picklists, as the Metadata API stuff required is different
     if (!cf.valueSet) {
       throw new SfdxError(messages.getMessage('errorStandardPicklist', [cfName]));
     }
     if (cf.valueSet.valueSetName) {
-      throw new SfdxError(messages.getMessage('errorGlobalPicklist', [cfName]));
+      const gvs = await conn.metadata.read('GlobalValueSet', cf.valueSet.valueSetName) as GlobalValueSet;
+      cf.valueSet.valueSetDefinition = {
+        sorted: gvs.sorted,
+        value: gvs.customValue,
+      };
+    }
+    if (!Array.isArray(cf.valueSet.valueSetDefinition.value)) {
+      // The picklist only has one value
+      cf.valueSet.valueSetDefinition.value = [cf.valueSet.valueSetDefinition.value];
     }
 
     const values = cf.valueSet.valueSetDefinition.value;
