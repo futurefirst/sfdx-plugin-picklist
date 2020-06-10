@@ -1,0 +1,10 @@
+{
+  "commandDescription": "upsert values for a picklist field",
+  "sobjecttypeFlagDescription": "the sObject type with the picklist field",
+  "fieldnameFlagDescription": "the name of the picklist field whose values you want to list",
+  "errorNoResult": "No such field or unable to access field: %s",
+  "errorNotPicklist": "Field is not a picklist: %s",
+  "errorStandardPicklist": "Standard picklists are not yet supported: %s",
+  "errorGlobalPicklist": "Global picklists are not yet supported: %s",
+  "errorApiVersion": "This plugin requires API >= %s, you are using %s"
+}
